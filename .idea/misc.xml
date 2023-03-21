@@ -4,6 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/mikol/android/Wortschatz/app/src/main/res/layout/activity_main.xml" value="0.11018518518518519" />
+        <entry key="..\:/mikol/android/Wortschatz/app/src/main/res/layout/item_chapter.xml" value="0.1" />
+        <entry key="..\:/mikol/android/Wortschatz/app/src/main/res/layout/view_chapters.xml" value="0.1" />
+        <entry key="..\:/mikol/android/Wortschatz/app/src/main/res/menu/menu_bottom.xml" value="0.1" />
       </map>
     </option>
   </component>

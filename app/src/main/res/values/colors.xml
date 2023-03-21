@@ -10,6 +10,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="beige">#FEFBE9</color>
     <color name="light_green">#E1EEDD</color>
-    <color name="orange">F0A04B</color>
-    <color name="dark_green">183A1D</color>
+    <color name="orange">#F0A04B</color>
+    <color name="dark_green">#183A1D</color>
+    <color name="transparent">#00000000</color>
 </resources>
