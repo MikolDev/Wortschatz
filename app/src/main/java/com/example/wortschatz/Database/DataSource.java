@@ -1,36 +1,118 @@
 package com.example.wortschatz.Database;
 
+import android.content.Context;
+import android.util.Log;
+
+import com.example.wortschatz.Model.Phrase;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class DataSource {
-    private ArrayList<String> chaptersList;
+    Context context;
+    public static final String TAG = "tescior";
+    private final ArrayList<String> chaptersList;
+    private final ArrayList<Phrase> phrasesList;
+    private final String[] CHAPTERS = {
+            "Człowiek",
+            "Miejsce zamieszkania",
+            "Edukacja",
+            "Praca",
+            "Życie prywatne",
+            "Żywienie",
+            "Zakupy i usługi",
+            "Podróżowanie i turystyka",
+            "Kultura",
+            "Sport",
+            "Zdrowie",
+            "Nauka i technika",
+            "Świat przyrody",
+            "Państwo i społeczeństwo"
+    };
+    private final String[] FILE_NAMES = {
+            "czlowiek",
+            "zamieszkanie",
+            "edukacja",
+            "praca",
+            "zycie",
+            "zywienie",
+            "zakupy",
+            "podrozowanie",
+            "kultura",
+            "sport",
+            "zdrowie",
+            "nauka",
+            "przyroda",
+            "panstwo"
+    };
 
-    public DataSource() {
+    public DataSource(Context context) {
+        this.context = context;
         chaptersList = createChaptersList();
+        phrasesList = createPhrasesList(12);
     }
 
     private ArrayList<String> createChaptersList() {
         ArrayList<String> list = new ArrayList<>();
 
-        list.add("Człowiek");
-        list.add("Miejsce zamieszkania");
-        list.add("Edukacja");
-        list.add("Praca");
-        list.add("Życie prywatne");
-        list.add("Żywienie");
-        list.add("Zakupy i usługi");
-        list.add("Podróżowanie i turystyka");
-        list.add("Kultura");
-        list.add("Sport");
-        list.add("Zdrowie");
-        list.add("Nauka i technika");
-        list.add("Świat przyrody");
-        list.add("Państwo i społeczeństwo");
+        Collections.addAll(list, CHAPTERS);
 
         return list;
     }
 
     public ArrayList<String> getChaptersList() {
         return chaptersList;
+    }
+
+    private ArrayList<Phrase> createPhrasesList(int chapterIndex) {
+        ArrayList<Phrase> phrases = new ArrayList<>();
+        String str = "";
+        String chapter = CHAPTERS[chapterIndex];
+        String fileName = FILE_NAMES[chapterIndex];
+
+
+        try {
+            InputStream inputStream = context.getAssets().open(fileName);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+            if (inputStream != null) {
+                while ((str = bufferedReader.readLine()) != null) {
+                    String[] array = str.split(";");
+                    String singular = array[0].trim();
+                    String plural = array[1].trim();
+                    String translation = array[2].trim();
+                    int isHard = Integer.parseInt(array[3].trim());
+
+                    Phrase phrase = new Phrase();
+                    phrase.setSingular(singular);
+                    phrase.setPlural(plural);
+                    phrase.setTranslation(translation);
+                    phrase.setHard(isHard == 1);
+                    phrase.setChapter(chapter);
+
+                    phrases.add(phrase);
+
+                    Log.v(TAG, phrase.toString());
+                }
+            }
+
+            if (inputStream != null) {
+                inputStream.close();
+            }
+
+        } catch (IOException e) {
+            Log.v(TAG, "Nie znaleziono pliku");
+            e.printStackTrace();
+        }
+
+        return phrases;
+    }
+
+    public ArrayList<Phrase> getPhrasesList() {
+        return phrasesList;
     }
 }

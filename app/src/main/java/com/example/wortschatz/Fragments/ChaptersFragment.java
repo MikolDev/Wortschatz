@@ -1,11 +1,14 @@
 package com.example.wortschatz.Fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +25,8 @@ public class ChaptersFragment extends Fragment {
     MainActivity mainActivity;
     View view;
     DbHelper dbHelper;
+    String chapter;
+    public static final String TAG = "tescior";
 
     @Nullable
     @Override
@@ -34,8 +39,18 @@ public class ChaptersFragment extends Fragment {
         ArrayList<String> chapters = dbHelper.getChapters();
         ArrayAdapter<String> chaptersAdapter = new ArrayAdapter<String>(mainActivity, R.layout.item_chapter, chapters);
         listView.setAdapter(chaptersAdapter);
-
+        startListener(listView);
 
         return view;
+    }
+
+    public void startListener(ListView listView) {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                chapter = (String) parent.getItemAtPosition(position);
+                Toast.makeText(mainActivity, "Wybrano: " + chapter, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
