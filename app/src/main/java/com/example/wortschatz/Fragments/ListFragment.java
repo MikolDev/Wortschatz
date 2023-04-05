@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,6 +39,9 @@ public class ListFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewList);
         PhraseAdapter phraseAdapter = new PhraseAdapter(mainActivity, dbHelper.getPhrasesByChapter(chapter));
         recyclerView.setAdapter(phraseAdapter);
+
+        TextView titleView = view.findViewById(R.id.chapter_title);
+        titleView.setText(chapter);
 
         return view;
     }

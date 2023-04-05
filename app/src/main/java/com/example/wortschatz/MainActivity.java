@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.wortschatz.Database.DbHelper;
 import com.example.wortschatz.Database.PhraseUpdater;
@@ -22,9 +23,10 @@ import com.google.android.material.navigation.NavigationBarView;
 public class MainActivity extends AppCompatActivity {
     public BottomAppBar bottomAppBar;
     public BottomNavigationView bottomNavigationView;
-    public String currentChapter;
+    public String currentChapter = "";
     public static final int CHAPTERS_FRAGMENT_ID = 0;
     public static final int LIST_FRAGMENT_ID = 1;
+    public static final int LEARN_FRAGMENT_ID = 2;
     public DbHelper dbHelper;
     public PhraseUpdater phraseUpdater;
 
@@ -45,18 +47,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void changeFragment(int id) {
-        Fragment fragment;
+        Fragment fragment = null;
+        int itemId;
 
         switch(id) {
             case CHAPTERS_FRAGMENT_ID:
                 fragment = new ChaptersFragment();
+                itemId = R.id.item_chapters;
                 break;
             case LIST_FRAGMENT_ID:
                 fragment = new ListFragment();
+                itemId = R.id.item_list;
+                break;
+            case LEARN_FRAGMENT_ID:
+                //fragment
+                itemId = R.id.item_learn;
                 break;
             default:
+                itemId = R.id.item_chapters;
                 fragment = new ChaptersFragment();
         }
+
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
     }
 

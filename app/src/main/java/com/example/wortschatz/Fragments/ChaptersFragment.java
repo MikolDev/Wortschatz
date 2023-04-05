@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,17 +46,21 @@ public class ChaptersFragment extends Fragment {
         listView.setAdapter(chaptersAdapter);
         startListener(listView);
 
+        TextView currentChapterView = view.findViewById(R.id.selected_chapter);
+        currentChapterView.setText("Wybrany rozdział: " + mainActivity.currentChapter);
+
         return view;
     }
 
     public void startListener(ListView listView) {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 chapter = (String) parent.getItemAtPosition(position);
                 Toast.makeText(mainActivity, "Wybrano: " + chapter, Toast.LENGTH_SHORT).show();
                 mainActivity.currentChapter = chapter;
-                mainActivity.changeFragment(MainActivity.LIST_FRAGMENT_ID);
+                View item = mainActivity.bottomNavigationView.findViewById(R.id.item_list);
+                item.performClick();
             }
         });
     }
