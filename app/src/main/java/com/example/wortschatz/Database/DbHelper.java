@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -13,8 +14,9 @@ import com.example.wortschatz.Model.Phrase;
 import java.util.ArrayList;
 
 public class DbHelper extends SQLiteOpenHelper {
-    private static final int VERSION = 1;
-    private DataSource dataSource;
+    private static final int VERSION = 5;
+    public DataSource dataSource;
+    public static final String TAG = "Database";
 
     public DbHelper(@Nullable Context context) {
         super(context, "WortschatzDB.db", null, VERSION);
@@ -39,7 +41,11 @@ public class DbHelper extends SQLiteOpenHelper {
                 + "chapter TEXT"
                 + ");";
         db.execSQL(CREATE_PHRASES_TABLE);
-        insertPhrasesFromFiles(db);
+
+        // inserting phrases from all files
+        for (int i = 0; i < dataSource.getCHAPTERS().length; i++) {
+            insertPhrasesFromFile(db, i);
+        }
     }
 
     @Override
@@ -48,7 +54,8 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS phrases");
     }
 
-    public void insertChapters(SQLiteDatabase db) {
+    // inserting chapters names
+    private void insertChapters(SQLiteDatabase db) {
         ArrayList<ContentValues> contentValuesList = new ArrayList<>();
         ArrayList<String> repo = dataSource.getChaptersList();
 
@@ -66,6 +73,7 @@ public class DbHelper extends SQLiteOpenHelper {
         }));
     }
 
+    // getting list of chapters names
     public ArrayList<String> getChapters() {
         ArrayList<String> list = new ArrayList<>();
 
@@ -82,9 +90,11 @@ public class DbHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    public void insertPhrasesFromFiles(SQLiteDatabase db) {
+    // inserting all the phrases from files
+    private int insertPhrasesFromFile(SQLiteDatabase db, int chapterIndex) {
         ArrayList<ContentValues> contentValuesList = new ArrayList<>();
-        ArrayList<Phrase> repo = dataSource.getPhrasesList();
+        ArrayList<Phrase> repo = dataSource.getPhrasesListByChapter(chapterIndex);
+        int counter = 0;
 
         for (int i = 0; i < repo.size(); i++) {
             ContentValues cv = new ContentValues();
@@ -103,18 +113,22 @@ public class DbHelper extends SQLiteOpenHelper {
             cv.put("chapter", chapter);
 
             contentValuesList.add(cv);
+            counter += 1;
         }
 
         contentValuesList.forEach((contentValues -> {
             db.insert("phrases", null, contentValues);
         }));
+
+        return counter;
     }
 
+    // getting all phrases from one chapter
     public ArrayList<Phrase> getPhrasesByChapter(String chapter) {
         ArrayList<Phrase> list = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT singular, plural, translation, isHard, chapter, id FROM phrases WHERE chapter = " + chapter, null);
+        Cursor c = db.rawQuery("SELECT singular, plural, translation, isHard, chapter, id FROM phrases WHERE chapter = \"" + chapter + "\"", null);
 
         if (c.moveToFirst()){
             do {
@@ -125,11 +139,41 @@ public class DbHelper extends SQLiteOpenHelper {
                 String chapterName = c.getString(4);
                 int id = c.getInt(5);
 
-                list.add(new Phrase(id, singular, plural, translation, isHard, chapter));
+                list.add(new Phrase(id, singular, plural, translation, isHard, chapterName));
+                Log.v(TAG, singular);
             } while (c.moveToNext());
         }
 
         c.close();
         return list;
+    }
+
+    // counts all phrases from chapter
+    public int getChapterCount(String chapter) {
+        int counter = 0;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT id FROM phrases WHERE chapter = \"" + chapter + "\"", null);
+
+        if (c.moveToFirst()){
+            do {
+                counter = c.getInt(0);
+            } while (c.moveToNext());
+        }
+
+        return counter;
+    }
+
+    private long deletePhrasesByChapter(String chapter) {
+        SQLiteDatabase db = getReadableDatabase();
+        long success = db.delete("phrases", "chapter=?", new String[]{chapter});
+        return success;
+    }
+
+    public int updatePhrasesByChapter(int chapterIndex) {
+        long deletedPhrases = deletePhrasesByChapter(dataSource.getCHAPTERS()[chapterIndex]);
+        SQLiteDatabase db = this.getWritableDatabase();
+        int updatedPhrases = (int) (insertPhrasesFromFile(db, chapterIndex) - deletedPhrases);
+        return updatedPhrases;
     }
 }

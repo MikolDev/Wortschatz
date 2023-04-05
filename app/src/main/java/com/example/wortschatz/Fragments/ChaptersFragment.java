@@ -33,7 +33,11 @@ public class ChaptersFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.view_chapters, container, false);
         mainActivity = (MainActivity) getActivity();
-        dbHelper = new DbHelper(mainActivity);
+        if (mainActivity != null) {
+            dbHelper = mainActivity.dbHelper;
+        } else {
+            Log.v("tescior", "Main activity null error");
+        }
 
         ListView listView = view.findViewById(R.id.list_view_chapters);
         ArrayList<String> chapters = dbHelper.getChapters();
@@ -50,6 +54,8 @@ public class ChaptersFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 chapter = (String) parent.getItemAtPosition(position);
                 Toast.makeText(mainActivity, "Wybrano: " + chapter, Toast.LENGTH_SHORT).show();
+                mainActivity.currentChapter = chapter;
+                mainActivity.changeFragment(MainActivity.LIST_FRAGMENT_ID);
             }
         });
     }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/item_singular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="der Baum"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        />
+
+    <TextView
+        android:id="@+id/item_plural"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bäume"
+        android:layout_marginLeft="10dp"
+        android:textSize="18sp"
+        android:layout_toEndOf="@id/item_singular"/>
+
+    <TextView
+        android:id="@+id/item_translation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/item_singular"
+        android:layout_alignStart="@id/item_singular"
+        android:text="drzewo"
+        android:textSize="18sp"
+        android:textStyle="italic"/>
+
+
+</RelativeLayout>
