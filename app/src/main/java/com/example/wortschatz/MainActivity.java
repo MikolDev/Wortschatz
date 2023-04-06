@@ -53,18 +53,14 @@ public class MainActivity extends AppCompatActivity {
         switch(id) {
             case CHAPTERS_FRAGMENT_ID:
                 fragment = new ChaptersFragment();
-                itemId = R.id.item_chapters;
                 break;
             case LIST_FRAGMENT_ID:
                 fragment = new ListFragment();
-                itemId = R.id.item_list;
                 break;
             case LEARN_FRAGMENT_ID:
                 //fragment
-                itemId = R.id.item_learn;
                 break;
             default:
-                itemId = R.id.item_chapters;
                 fragment = new ChaptersFragment();
         }
 

@@ -5,4 +5,8 @@
     <string name="learn">Ćwicz</string>
     <string name="chapters">Rozdziały</string>
     <string name="update_phrases">Aktualizuj słówka</string>
+    <string name="add_phrase">Dodaj wyrażenie</string>
+    <string name="singular">Liczba pojedyncza</string>
+    <string name="plural">Liczba mnoga</string>
+    <string name="translation">Tłumaczenie</string>
 </resources>

@@ -20,6 +20,15 @@ public class Phrase {
         this.chapter = chapter;
     }
 
+    public Phrase(String singular, String plural, String translation, String chapter) {
+        this.id = 0;
+        this.singular = singular;
+        this.plural = plural;
+        this.translation = translation;
+        this.isHard = false;
+        this.chapter = chapter;
+    }
+
     public int getId() {
         return id;
     }

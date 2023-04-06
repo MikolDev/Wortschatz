@@ -57,7 +57,6 @@ public class ChaptersFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 chapter = (String) parent.getItemAtPosition(position);
-                Toast.makeText(mainActivity, "Wybrano: " + chapter, Toast.LENGTH_SHORT).show();
                 mainActivity.currentChapter = chapter;
                 View item = mainActivity.bottomNavigationView.findViewById(R.id.item_list);
                 item.performClick();
