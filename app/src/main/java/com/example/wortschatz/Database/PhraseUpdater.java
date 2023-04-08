@@ -6,10 +6,6 @@ import android.widget.Toast;
 
 import com.example.wortschatz.Model.Phrase;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class PhraseUpdater {
@@ -29,51 +25,9 @@ public class PhraseUpdater {
         this.FILE_NAMES = dataSource.getFILE_NAMES();
     }
 
-    public ArrayList<Phrase> getPhrasesByChapter(int chapterIndex) {
-        String str = "";
-        String chapter = CHAPTERS[chapterIndex];
-        String fileName = FILE_NAMES[chapterIndex];
-        ArrayList<Phrase> list = new ArrayList<>();
-
-        try {
-            // tu trzeba zmienić assets na plik z com.example
-            // albo wszystko się sypie, bo nie da sie nic wpisac do assets
-            InputStream inputStream = context.getAssets().open(fileName);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
-            if (inputStream != null) {
-                while ((str = bufferedReader.readLine()) != null) {
-                    String[] array = str.split(";");
-                    String singular = array[0].trim();
-                    String plural = array[1].trim();
-                    String translation = array[2].trim();
-                    int isHard = Integer.parseInt(array[3].trim());
-
-                    Phrase phrase = new Phrase();
-                    phrase.setSingular(singular);
-                    phrase.setPlural(plural);
-                    phrase.setTranslation(translation);
-                    phrase.setHard(isHard == 1);
-                    phrase.setChapter(chapter);
-
-                    list.add(phrase);
-                }
-            }
-
-            if (inputStream != null) {
-                inputStream.close();
-            }
-
-        } catch (IOException e) {
-            Log.v(TAG, "Nie znaleziono pliku");
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-
+    // zamiast porównywać długości w bazie i w assets, powinienem sprawdzić, czy któryś plik w assets został zmodyfikowany
     public boolean checkFileAndDb(int chapterIndex) {
-        ArrayList<Phrase> list = getPhrasesByChapter(chapterIndex);
+        ArrayList<Phrase> list = dataSource.getPhrasesListByChapter(chapterIndex);
         int fileLength = list.size();
 
         int dbLength = dbHelper.getChapterCount(CHAPTERS[chapterIndex]);
