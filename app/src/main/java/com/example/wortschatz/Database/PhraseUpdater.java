@@ -7,11 +7,9 @@ import android.widget.Toast;
 import com.example.wortschatz.Model.Phrase;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class PhraseUpdater {
@@ -96,18 +94,6 @@ public class PhraseUpdater {
         Toast.makeText(context, "Zaktualizowano " + updatedPhrases + " wyrażeń", Toast.LENGTH_SHORT).show();
     }
 
-    public void addPhraseToFile(Phrase phrase) {
-        String singular = phrase.getSingular();
-        String plural = phrase.getPlural();
-        String translation = phrase.getTranslation();
-        String chapter = phrase.getChapter();
-
-        int chapterIndex = findChapterIndex(chapter);
-        String fileName = FILE_NAMES[chapterIndex];
-        // zapisywanie do pliku
-        // dodanie do bazy danych
-    }
-
     public int findChapterIndex(String chapter) {
         for (int i = 0; i < CHAPTERS.length; i++) {
             if (chapter.trim().equalsIgnoreCase(CHAPTERS[i].trim())) {
@@ -115,5 +101,11 @@ public class PhraseUpdater {
             }
         }
         return -1;
+    }
+
+    public boolean addPhrase(Phrase p) {
+        if (dbHelper.doPhraseExist(p)) return false;
+        long response = dbHelper.insertPhrase(p);
+        return response > 0;
     }
 }

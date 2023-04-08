@@ -1,15 +1,14 @@
 package com.example.wortschatz.Fragments;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +23,6 @@ import com.example.wortschatz.MainActivity;
 import com.example.wortschatz.Model.Phrase;
 import com.example.wortschatz.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
@@ -35,6 +33,8 @@ public class ListFragment extends Fragment {
     RecyclerView recyclerView;
     String chapter;
     PhraseUpdater phraseUpdater;
+    PhraseAdapter phraseAdapter;
+    ArrayList<Phrase> phrasesList;
 
     @Nullable
     @Override
@@ -46,12 +46,13 @@ public class ListFragment extends Fragment {
         } else {
             Log.v("tescior", "Main activity null error");
         }
+
         chapter = mainActivity.currentChapter;
         phraseUpdater = mainActivity.phraseUpdater;
 
         recyclerView = view.findViewById(R.id.recyclerViewList);
-        ArrayList<Phrase> phrasesList = dbHelper.getPhrasesByChapter(chapter);
-        PhraseAdapter phraseAdapter = new PhraseAdapter(mainActivity, phrasesList);
+        phrasesList = dbHelper.getPhrasesByChapter(chapter);
+        phraseAdapter = new PhraseAdapter(mainActivity, phrasesList);
         recyclerView.setAdapter(phraseAdapter);
 
         TextView titleView = view.findViewById(R.id.chapter_title);
@@ -97,8 +98,15 @@ public class ListFragment extends Fragment {
                 // liczba mnoga może nie istnieć
                 if (!singular.equals("") && !translation.equals("")) {
                     Phrase phrase = new Phrase(singular, plural, translation, chapter);
-                    Snackbar.make(view, "Nowe słówko " + phrase, Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    boolean response = phraseUpdater.addPhrase(phrase);
+
+                    if (response) {
+                        Toast.makeText(mainActivity, "Dodano słówko: " + phrase.getSingular(), Toast.LENGTH_SHORT).show();
+                        phrasesList.add(phrase);
+                        phraseAdapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(mainActivity, "Nie udało się dodać słówka lub słówko istnieje w bazie", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 dialog.dismiss();

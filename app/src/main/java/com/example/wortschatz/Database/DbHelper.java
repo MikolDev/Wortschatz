@@ -176,4 +176,30 @@ public class DbHelper extends SQLiteOpenHelper {
         int updatedPhrases = (int) (insertPhrasesFromFile(db, chapterIndex) - deletedPhrases);
         return updatedPhrases;
     }
+
+    public boolean doPhraseExist(Phrase p) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String singular = p.getSingular();
+        String translation = p.getTranslation();
+
+        Cursor c = db.rawQuery("SELECT singular, translation FROM phrases WHERE singular = \"" + singular + "\" AND translation = \"" + translation + "\"", null);
+
+        if (c.getCount() > 0) return true;
+        return false;
+    }
+
+    public long insertPhrase(Phrase p) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put("singular", p.getSingular());
+        cv.put("plural", p.getPlural());
+        cv.put("translation", p.getTranslation());
+        cv.put("isHard", p.isHard());
+        cv.put("chapter", p.getChapter());
+
+        long success = db.insert("phrases", null, cv);
+
+        return success;
+    }
 }

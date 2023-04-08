@@ -1,21 +1,21 @@
 package com.example.wortschatz;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.wortschatz.Database.DbHelper;
 import com.example.wortschatz.Database.PhraseUpdater;
 import com.example.wortschatz.Fragments.ChaptersFragment;
 import com.example.wortschatz.Fragments.ListFragment;
-import com.example.wortschatz.Model.Phrase;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -44,11 +44,12 @@ public class MainActivity extends AppCompatActivity {
 
         dbHelper = new DbHelper(this);
         phraseUpdater = new PhraseUpdater(dbHelper, this);
+
+        currentChapter = dbHelper.dataSource.getCHAPTERS()[0];
     }
 
     public void changeFragment(int id) {
         Fragment fragment = null;
-        int itemId;
 
         switch(id) {
             case CHAPTERS_FRAGMENT_ID:
@@ -64,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new ChaptersFragment();
         }
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment).addToBackStack("tag").commit();
     }
 
     public void initNavigationListener() {
@@ -95,9 +97,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            // aktualizacja słówek z assets
             case R.id.item_update_phrases:
                 Log.v("update", "Updating new words from files.");
-                phraseUpdater.checkAllFiles();
+//               Tu trzeba pozmieniać sposób aktualizacji słówek z assets.
+//               Teraz sprawdzanie, czy zostały dodane jakieś słówka opiera się na mechanizmie
+//               liczenia rekordów w assets i w bazie danych.
+//                A to zły sposób, ponieważ do assets nie da się dodawać rekordów programowo, jedynie ręcznie,
+//                Zatem w bazie mogą być słówka dodane z poziomu aplikacji, których nie ma w assets.
+//                I wtedy zostają usunięte wszystkie słówka z danego działu i dział jest ponownie tworzony na podstawie
+//                pliku z assets, który nie zapisuje słówke dodanych z poziomu aplikacji - tracimy je.
+//                phraseUpdater.checkAllFiles();
+                Toast.makeText(this, "Funkcjonalność w budowie", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

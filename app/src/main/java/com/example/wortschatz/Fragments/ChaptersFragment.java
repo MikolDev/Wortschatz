@@ -9,7 +9,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,7 +19,6 @@ import com.example.wortschatz.MainActivity;
 import com.example.wortschatz.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ChaptersFragment extends Fragment {
     MainActivity mainActivity;
