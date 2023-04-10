@@ -198,8 +198,45 @@ public class DbHelper extends SQLiteOpenHelper {
         cv.put("isHard", p.isHard());
         cv.put("chapter", p.getChapter());
 
-        long success = db.insert("phrases", null, cv);
+        long success = -1;
 
+        if (!doPhraseExist(p)) {
+            success = db.insert("phrases", null, cv);
+        }
+
+        return success;
+    }
+
+    public boolean changingOnlyHard(Phrase p1, Phrase p2) {
+        return p1.getSingular().equals(p2.getSingular())
+                && p1.getPlural().equals(p2.getPlural())
+                && p1.getTranslation().equals(p2.getTranslation())
+                && p1.isHard() != p2.isHard();
+    }
+
+    public long updatePhrase(Phrase newPhrase, Phrase oldPhrase) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put("singular", newPhrase.getSingular());
+        cv.put("plural", newPhrase.getPlural());
+        cv.put("translation", newPhrase.getTranslation());
+        cv.put("isHard", newPhrase.isHard());
+        cv.put("chapter", newPhrase.getChapter());
+
+        int id = newPhrase.getId();
+        long success = -1;
+
+        if (!doPhraseExist(newPhrase) || changingOnlyHard(newPhrase, oldPhrase)){
+            success = db.update("phrases", cv, "id=?", new String[]{String.valueOf(id)});
+        }
+
+        return success;
+    }
+
+    public long deletePhraseById(int id) {
+        SQLiteDatabase db = getReadableDatabase();
+        long success = db.delete("phrases", "id=?", new String[]{String.valueOf(id)});
         return success;
     }
 }

@@ -20,12 +20,12 @@ public class Phrase {
         this.chapter = chapter;
     }
 
-    public Phrase(String singular, String plural, String translation, String chapter) {
+    public Phrase(String singular, String plural, String translation, boolean isHard, String chapter) {
         this.id = 0;
         this.singular = singular;
         this.plural = plural;
         this.translation = translation;
-        this.isHard = false;
+        this.isHard = isHard;
         this.chapter = chapter;
     }
 

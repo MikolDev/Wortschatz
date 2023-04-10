@@ -26,7 +26,7 @@
         android:hint="@string/translation"
         android:layout_marginBottom="10dp"/>
 
-    <Switch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switch_add_is_hard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

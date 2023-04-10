@@ -1,6 +1,8 @@
 package com.example.wortschatz.Controller;
 
 import android.content.Context;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,10 +40,16 @@ public class PhraseAdapter extends RecyclerView.Adapter<PhraseAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Phrase phrase = phrasesList.get(position);
 
-        holder.textSingular.setText(phrase.getSingular());
         holder.textPlural.setText(phrase.getPlural());
         holder.textTranslation.setText(phrase.getTranslation());
-        Log.v("Adapter", phrase.getSingular());
+
+        if (phrase.isHard()) {
+            SpannableString underlined = new SpannableString(phrase.getSingular());
+            underlined.setSpan(new UnderlineSpan(), 0, underlined.length(), 0);
+            holder.textSingular.setText(underlined);
+        } else {
+            holder.textSingular.setText(phrase.getSingular());
+        }
     }
 
     @Override
@@ -63,50 +71,3 @@ public class PhraseAdapter extends RecyclerView.Adapter<PhraseAdapter.ViewHolder
     }
 
 }
-//
-//public class PhraseAdapter extends BaseAdapter {
-//    Context context;
-//    ArrayList<Phrase> phrasesList;
-//    LayoutInflater layoutInflater;
-//
-//    TextView textSingular;
-//    TextView textPlural;
-//    TextView textTranslation;
-//
-//    public PhraseAdapter(Context context, ArrayList<Phrase> phrasesList) {
-//        this.context = context;
-//        this.phrasesList = phrasesList;
-//        this.layoutInflater = LayoutInflater.from(context);
-//    }
-//
-//    @Override
-//    public int getCount() {
-//        return phrasesList.size();
-//    }
-//
-//    @Override
-//    public Object getItem(int position) {
-//        return phrasesList.get(position);
-//    }
-//
-//    @Override
-//    public long getItemId(int position) {
-//        return 0;
-//    }
-//
-//    @Override
-//    public View getView(int position, View view, ViewGroup parent) {
-//        Phrase phrase = phrasesList.get(position);
-//
-//        view = layoutInflater.inflate(R.layout.item_phrase, null);
-//        textSingular = view.findViewById(R.id.item_singular);
-//        textPlural = view.findViewById(R.id.item_plural);
-//        textTranslation = view.findViewById(R.id.item_translation);
-//
-//        textSingular.setText(phrase.getSingular());
-//        textPlural.setText(phrase.getPlural());
-//        textTranslation.setText(phrase.getTranslation());
-//
-//        return view;
-//    }
-//}

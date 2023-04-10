@@ -1,6 +1,5 @@
 package com.example.wortschatz.Fragments;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +12,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wortschatz.Controller.PhraseAdapter;
@@ -26,6 +28,7 @@ import com.example.wortschatz.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ListFragment extends Fragment {
     MainActivity mainActivity;
@@ -53,6 +56,8 @@ public class ListFragment extends Fragment {
         phraseUpdater = mainActivity.phraseUpdater;
 
         recyclerView = view.findViewById(R.id.recyclerViewList);
+        recyclerView.addItemDecoration(mainActivity.divider);
+
         phrasesList = dbHelper.getPhrasesByChapter(chapter);
         phraseAdapter = new PhraseAdapter(mainActivity, phrasesList);
         recyclerView.setAdapter(phraseAdapter);
@@ -69,9 +74,7 @@ public class ListFragment extends Fragment {
 
     public void initAddListener() {
         FloatingActionButton addButton = view.findViewById(R.id.add_floating_button);
-        addButton.setOnClickListener(v -> {
-            showAddAlertDialog();
-        });
+        addButton.setOnClickListener(v -> showAddAlertDialog());
     }
 
     public void initRecyclerListener() {
@@ -98,30 +101,53 @@ public class ListFragment extends Fragment {
         EditText editSingular = dialogLayout.findViewById(R.id.edit_add_singular);
         EditText editPlural = dialogLayout.findViewById(R.id.edit_add_plural);
         EditText editTranslation = dialogLayout.findViewById(R.id.edit_add_translation);
+        SwitchCompat switchIsHard = dialogLayout.findViewById(R.id.switch_add_is_hard);
 
         editSingular.setText(phrase.getSingular());
         editPlural.setText(phrase.getPlural());
         editTranslation.setText(phrase.getTranslation());
+        switchIsHard.setChecked(phrase.isHard());
 
-        alert.setPositiveButton("Edytuj", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+        alert.setPositiveButton("Edytuj", (dialog, which) -> {
+            int id = phrase.getId();
+            String singular = String.valueOf(editSingular.getText()).trim();
+            String plural = String.valueOf(editPlural.getText()).trim();
+            String translation = String.valueOf(editTranslation.getText()).trim();
+            boolean isHard = switchIsHard.isChecked();
 
+            // edited phrase but with old id
+            Phrase newPhrase = new Phrase(id, singular, plural, translation, isHard, chapter);
+
+            long res = dbHelper.updatePhrase(newPhrase, phrase);
+            if (res > 0) {
+                Toast.makeText(mainActivity, "Zaktualizowano słówko", Toast.LENGTH_SHORT).show();
+                phrasesList.set(position, newPhrase);
+                phraseAdapter.notifyDataSetChanged();
+            } else {
+                Toast.makeText(mainActivity, "Nie udało się zaktualizować słówka lub słówko istnieje", Toast.LENGTH_SHORT).show();
             }
         });
 
-        alert.setNeutralButton("Anuluj", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        alert.setNeutralButton("Anuluj", (dialog, which) -> dialog.dismiss());
 
-        alert.setNegativeButton("Usuń", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+        alert.setNegativeButton("Usuń", (dialog, which) -> {
+            AlertDialog.Builder areSure = new AlertDialog.Builder(mainActivity);
+            areSure.setTitle(getString(R.string.are_sure));
 
-            }
+            areSure.setNegativeButton("Wróc", (dialog1, which1) -> dialog1.dismiss());
+
+            areSure.setPositiveButton("Tak, usuń", (dialog12, which12) -> {
+                long res = dbHelper.deletePhraseById(phrase.getId());
+                if (res > 0) {
+                    Toast.makeText(mainActivity, "Usunięto wyrażenie", Toast.LENGTH_SHORT).show();
+                    phrasesList.remove(position);
+                    phraseAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(mainActivity, "Nie udało się usunąć wyrażenia", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            areSure.show();
         });
 
         alert.setView(dialogLayout);
@@ -135,40 +161,35 @@ public class ListFragment extends Fragment {
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.alert_add_phrase, null);
 
-        alert.setNegativeButton("Anuluj", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        alert.setNegativeButton("Anuluj", (dialog, which) -> dialog.dismiss());
 
-        alert.setPositiveButton("Dodaj", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                EditText editSingular = dialogLayout.findViewById(R.id.edit_add_singular);
-                EditText editPlural = dialogLayout.findViewById(R.id.edit_add_plural);
-                EditText editTranslation = dialogLayout.findViewById(R.id.edit_add_translation);
+        alert.setPositiveButton("Dodaj", (dialog, which) -> {
+            EditText editSingular = dialogLayout.findViewById(R.id.edit_add_singular);
+            EditText editPlural = dialogLayout.findViewById(R.id.edit_add_plural);
+            EditText editTranslation = dialogLayout.findViewById(R.id.edit_add_translation);
+            SwitchCompat switchIsHard = dialogLayout.findViewById(R.id.switch_add_is_hard);
 
-                String singular = String.valueOf(editSingular.getText());
-                String plural = String.valueOf(editPlural.getText());
-                String translation = String.valueOf(editTranslation.getText());
+            String singular = String.valueOf(editSingular.getText()).trim();
+            String plural = String.valueOf(editPlural.getText()).trim();
+            String translation = String.valueOf(editTranslation.getText()).trim();
+            boolean isHard = switchIsHard.isChecked();
 
-                // liczba mnoga może nie istnieć
-                if (!singular.equals("") && !translation.equals("")) {
-                    Phrase phrase = new Phrase(singular, plural, translation, chapter);
-                    boolean response = phraseUpdater.addPhrase(phrase);
+            // liczba mnoga może nie istnieć
+            if (!singular.equals("") && !translation.equals("")) {
+                Phrase phrase = new Phrase(singular, plural, translation, isHard, chapter);
+                long res = dbHelper.insertPhrase(phrase);
 
-                    if (response) {
-                        Toast.makeText(mainActivity, "Dodano słówko: " + phrase.getSingular(), Toast.LENGTH_SHORT).show();
-                        phrasesList.add(phrase);
-                        phraseAdapter.notifyDataSetChanged();
-                    } else {
-                        Toast.makeText(mainActivity, "Nie udało się dodać słówka lub słówko istnieje w bazie", Toast.LENGTH_SHORT).show();
-                    }
+                if (res > 0) {
+                    Toast.makeText(mainActivity, "Dodano słówko: " + phrase.getSingular(), Toast.LENGTH_SHORT).show();
+                    phrase.setId((int) res);
+                    phrasesList.add(phrase);
+                    phraseAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(mainActivity, "Nie udało się dodać słówka lub słówko istnieje w bazie", Toast.LENGTH_SHORT).show();
                 }
-
-                dialog.dismiss();
             }
+
+            dialog.dismiss();
         });
 
         alert.setView(dialogLayout);

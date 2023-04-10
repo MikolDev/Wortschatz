@@ -9,6 +9,10 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:text=""
+        android:layout_marginLeft="16dp"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/orange"
         />
 
     <ListView
@@ -16,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/chapters"
+        android:paddingHorizontal="16dp"
         />
 
 

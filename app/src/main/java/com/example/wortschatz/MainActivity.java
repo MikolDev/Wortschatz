@@ -9,8 +9,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DividerItemDecoration;
 
 import com.example.wortschatz.Database.DbHelper;
 import com.example.wortschatz.Database.PhraseUpdater;
@@ -19,6 +21,8 @@ import com.example.wortschatz.Fragments.ListFragment;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     public BottomAppBar bottomAppBar;
@@ -29,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int LEARN_FRAGMENT_ID = 2;
     public DbHelper dbHelper;
     public PhraseUpdater phraseUpdater;
+    public DividerItemDecoration divider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
         phraseUpdater = new PhraseUpdater(dbHelper, this);
 
         currentChapter = dbHelper.dataSource.getCHAPTERS()[0];
+
+        divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        divider.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(this, R.drawable.divider)));
     }
 
     public void changeFragment(int id) {
