@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wortschatz.Controller.PhraseAdapter;
+import com.example.wortschatz.Controller.PhraseTouchListener;
 import com.example.wortschatz.Database.DbHelper;
 import com.example.wortschatz.Database.PhraseUpdater;
 import com.example.wortschatz.MainActivity;
@@ -35,6 +36,7 @@ public class ListFragment extends Fragment {
     PhraseUpdater phraseUpdater;
     PhraseAdapter phraseAdapter;
     ArrayList<Phrase> phrasesList;
+    public static final String TAG = "list";
 
     @Nullable
     @Override
@@ -60,17 +62,73 @@ public class ListFragment extends Fragment {
 
         initAddListener();
 
+        initRecyclerListener();
+
         return view;
     }
 
     public void initAddListener() {
         FloatingActionButton addButton = view.findViewById(R.id.add_floating_button);
         addButton.setOnClickListener(v -> {
-            showAlertDialog();
+            showAddAlertDialog();
         });
     }
 
-    public void showAlertDialog() {
+    public void initRecyclerListener() {
+        recyclerView.addOnItemTouchListener(new PhraseTouchListener(mainActivity, recyclerView, new PhraseTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Log.v(TAG, "click" + phrasesList.get(position));
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+                showEditPhraseAlertDialog(position);
+            }
+        }));
+    }
+
+    public void showEditPhraseAlertDialog(int position) {
+        Phrase phrase = phrasesList.get(position);
+        AlertDialog.Builder alert = new AlertDialog.Builder(mainActivity);
+        alert.setTitle(phrase.getSingular());
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogLayout = inflater.inflate(R.layout.alert_add_phrase, null);
+
+        EditText editSingular = dialogLayout.findViewById(R.id.edit_add_singular);
+        EditText editPlural = dialogLayout.findViewById(R.id.edit_add_plural);
+        EditText editTranslation = dialogLayout.findViewById(R.id.edit_add_translation);
+
+        editSingular.setText(phrase.getSingular());
+        editPlural.setText(phrase.getPlural());
+        editTranslation.setText(phrase.getTranslation());
+
+        alert.setPositiveButton("Edytuj", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        alert.setNeutralButton("Anuluj", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        alert.setNegativeButton("Usuń", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        alert.setView(dialogLayout);
+        alert.show();
+    }
+
+    public void showAddAlertDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(mainActivity);
         alert.setTitle(getString(R.string.add_phrase));
 
