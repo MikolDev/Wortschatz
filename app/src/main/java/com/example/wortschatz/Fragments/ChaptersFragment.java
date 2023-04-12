@@ -33,7 +33,7 @@ public class ChaptersFragment extends Fragment {
         view = inflater.inflate(R.layout.view_chapters, container, false);
         mainActivity = (MainActivity) getActivity();
         if (mainActivity != null) {
-            dbHelper = mainActivity.dbHelper;
+            dbHelper = mainActivity.getDbHelper();
         } else {
             Log.v("tescior", "Main activity null error");
         }

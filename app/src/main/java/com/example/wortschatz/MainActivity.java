@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int CHAPTERS_FRAGMENT_ID = 0;
     public static final int LIST_FRAGMENT_ID = 1;
     public static final int LEARN_FRAGMENT_ID = 2;
-    public DbHelper dbHelper;
+    private DbHelper dbHelper;
     public PhraseUpdater phraseUpdater;
     public DividerItemDecoration divider;
 
@@ -125,5 +125,13 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public String getCurrentChapter() {
+        return currentChapter;
+    }
+
+    public DbHelper getDbHelper() {
+        return dbHelper;
     }
 }
