@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import com.example.wortschatz.Database.DbHelper;
 import com.example.wortschatz.Database.PhraseUpdater;
 import com.example.wortschatz.Fragments.ChaptersFragment;
+import com.example.wortschatz.Fragments.LearnFragment;
 import com.example.wortschatz.Fragments.ListFragment;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new ListFragment();
                 break;
             case LEARN_FRAGMENT_ID:
-                //fragment
+                fragment = new LearnFragment();
                 break;
             default:
                 fragment = new ChaptersFragment();
@@ -87,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     case R.id.item_list:
                         changeFragment(LIST_FRAGMENT_ID);
+                        return true;
+                    case R.id.item_learn:
+                        changeFragment(LEARN_FRAGMENT_ID);
                         return true;
                     default:
                         return false;
