@@ -1,7 +1,9 @@
 package com.example.wortschatz.Fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -29,6 +31,7 @@ public class LearnFragment extends Fragment {
     private TextView tvPlural;
     private TextView tvCounter;
     private int currentIndex = 0;
+    private boolean doShowTranslation;
 
     @Nullable
     @Override
@@ -37,6 +40,7 @@ public class LearnFragment extends Fragment {
         mainActivity = (MainActivity) getActivity();
         dbHelper = mainActivity.getDbHelper();
         chapter = mainActivity.getCurrentChapter();
+        doShowTranslation = false;
 
         // Prepare those views
         tvChapter = view.findViewById(R.id.learn_chapter);
@@ -87,13 +91,28 @@ public class LearnFragment extends Fragment {
     }
 
     /**
+     * Shows translation.
+     *
+     * @param i index of translated phrase
+     */
+    public void showTranslation(int i) {
+        Phrase currentPhrase = phrasesList.get(i);
+
+        tvSingular.setText(currentPhrase.getTranslation());
+        tvPlural.setText("");
+    }
+
+    /**
      * Starts swiping listener. You can learn by swiping phrases like those girls on Tinder.
      *
      */
     public void initSwipeListener() {
         view.setOnTouchListener(new OnSwipeTouchListener(mainActivity){
+
             @Override
             public void onSwipeRight() {
+                doShowTranslation = false;
+
                 if (currentIndex == 0) {
                     currentIndex = phrasesList.size() - 1;
                     setCounter(currentIndex);
@@ -107,6 +126,8 @@ public class LearnFragment extends Fragment {
 
             @Override
             public void onSwipeLeft() {
+                doShowTranslation = false;
+
                 if (currentIndex + 1 < phrasesList.size()) {
                     currentIndex += 1;
                     setCounter(currentIndex);
@@ -118,5 +139,17 @@ public class LearnFragment extends Fragment {
                 }
             }
         });
+    }
+
+    /**
+     * Show translation or phrase.
+     */
+    public void setDoShowTranslation() {
+        doShowTranslation = !doShowTranslation;
+        if (doShowTranslation) {
+            showTranslation(currentIndex);
+        } else {
+            showPhrase(currentIndex);
+        }
     }
 }
