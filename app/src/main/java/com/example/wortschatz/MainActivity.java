@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     public BottomAppBar bottomAppBar;
     public BottomNavigationView bottomNavigationView;
     public String currentChapter = "";
+    // mozna dac do assetow
     public static final int CHAPTERS_FRAGMENT_ID = 0;
     public static final int LIST_FRAGMENT_ID = 1;
     public static final int LEARN_FRAGMENT_ID = 2;
@@ -51,12 +52,17 @@ public class MainActivity extends AppCompatActivity {
         dbHelper = new DbHelper(this);
         phraseUpdater = new PhraseUpdater(dbHelper, this);
 
-        currentChapter = dbHelper.dataSource.getCHAPTERS()[0];
+        currentChapter = dbHelper.dataSource.getChaptersList().get(0);
 
         divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         divider.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(this, R.drawable.divider)));
     }
 
+    /**
+     * Changes view by given id.
+     *
+     * @param id id of desired view
+     */
     public void changeFragment(int id) {
         Fragment fragment = null;
 
@@ -78,6 +84,10 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.fragment_container, fragment).addToBackStack("tag").commit();
     }
 
+    /**
+     * Starts listener on navigation.
+     *
+     */
     public void initNavigationListener() {
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -99,6 +109,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Creates top menu options.
+     *
+     * @param menu top menu
+     * @return menu options
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -109,17 +125,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            // aktualizacja słówek z assets
-            case R.id.item_update_phrases:
-                Log.v("update", "Updating new words from files.");
-//               Tu trzeba pozmieniać sposób aktualizacji słówek z assets.
-//               Teraz sprawdzanie, czy zostały dodane jakieś słówka opiera się na mechanizmie
-//               liczenia rekordów w assets i w bazie danych.
-//                A to zły sposób, ponieważ do assets nie da się dodawać rekordów programowo, jedynie ręcznie,
-//                Zatem w bazie mogą być słówka dodane z poziomu aplikacji, których nie ma w assets.
-//                I wtedy zostają usunięte wszystkie słówka z danego działu i dział jest ponownie tworzony na podstawie
-//                pliku z assets, który nie zapisuje słówke dodanych z poziomu aplikacji - tracimy je.
-//                phraseUpdater.checkAllFiles();
+            // Add phrases from .txt file
+            case R.id.item_add_phrases_from_txt:
                 Toast.makeText(this, "Funkcjonalność w budowie", Toast.LENGTH_SHORT).show();
                 return true;
             default:
@@ -127,10 +134,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Getter for current chapter name.
+     *
+     * @return choosed chapter name
+     */
     public String getCurrentChapter() {
         return currentChapter;
     }
 
+    /**
+     * Getter for local database helper.
+     *
+     * @return local database helper
+     */
     public DbHelper getDbHelper() {
         return dbHelper;
     }

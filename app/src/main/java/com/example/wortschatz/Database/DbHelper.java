@@ -14,7 +14,7 @@ import com.example.wortschatz.Model.Phrase;
 import java.util.ArrayList;
 
 public class DbHelper extends SQLiteOpenHelper {
-    private static final int VERSION = 5;
+    private static final int VERSION = 6;
     public DataSource dataSource;
     public static final String TAG = "Database";
 
@@ -41,11 +41,6 @@ public class DbHelper extends SQLiteOpenHelper {
                 + "chapter TEXT"
                 + ");";
         db.execSQL(CREATE_PHRASES_TABLE);
-
-        // inserting phrases from all files
-        for (int i = 0; i < dataSource.getCHAPTERS().length; i++) {
-            insertPhrasesFromFile(db, i);
-        }
     }
 
     @Override
@@ -54,7 +49,11 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS phrases");
     }
 
-    // inserting chapters names
+    /**
+     * Inserts all chapters names from assets to local database.
+     *
+     * @param db local database
+     */
     private void insertChapters(SQLiteDatabase db) {
         ArrayList<ContentValues> contentValuesList = new ArrayList<>();
         ArrayList<String> repo = dataSource.getChaptersList();
@@ -73,7 +72,11 @@ public class DbHelper extends SQLiteOpenHelper {
         }));
     }
 
-    // getting list of chapters names
+    /**
+     * Returns list of chapters from local database.
+     *
+     * @return chapters list
+     */
     public ArrayList<String> getChapters() {
         ArrayList<String> list = new ArrayList<>();
 
@@ -90,40 +93,13 @@ public class DbHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    // inserting all the phrases from files
-    private int insertPhrasesFromFile(SQLiteDatabase db, int chapterIndex) {
-        ArrayList<ContentValues> contentValuesList = new ArrayList<>();
-        ArrayList<Phrase> repo = dataSource.getPhrasesListByChapter(chapterIndex);
-        int counter = 0;
 
-        for (int i = 0; i < repo.size(); i++) {
-            ContentValues cv = new ContentValues();
-            Phrase phrase = repo.get(i);
-
-            String singular = phrase.getSingular();
-            String plural = phrase.getPlural();
-            String translation = phrase.getTranslation();
-            Boolean isHard = phrase.isHard();
-            String chapter = phrase.getChapter();
-
-            cv.put("singular", singular);
-            cv.put("plural", plural);
-            cv.put("translation", translation);
-            cv.put("isHard", isHard);
-            cv.put("chapter", chapter);
-
-            contentValuesList.add(cv);
-            counter += 1;
-        }
-
-        contentValuesList.forEach((contentValues -> {
-            db.insert("phrases", null, contentValues);
-        }));
-
-        return counter;
-    }
-
-    // getting all phrases from one chapter
+    /**
+     * Returns all phrases from given chapter from local database.
+     *
+     * @param chapter desired chapter
+     * @return list of phrases from desired chapter
+     */
     public ArrayList<Phrase> getPhrasesByChapter(String chapter) {
         ArrayList<Phrase> list = new ArrayList<>();
 
@@ -148,7 +124,12 @@ public class DbHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    // counts all phrases from chapter
+    /**
+     * Counts phrases in a given chapter.
+     *
+     * @param chapter desired chapter
+     * @return count of phrases in a chapter
+     */
     public int getChapterCount(String chapter) {
         int counter = 0;
 
@@ -164,19 +145,25 @@ public class DbHelper extends SQLiteOpenHelper {
         return counter;
     }
 
+    /**
+     * Deletes all phrases from a given chapter
+     *
+     * @param chapter desired chapter
+     * @return if deleted successfully
+     */
     private long deletePhrasesByChapter(String chapter) {
         SQLiteDatabase db = getReadableDatabase();
         long success = db.delete("phrases", "chapter=?", new String[]{chapter});
         return success;
     }
 
-    public int updatePhrasesByChapter(int chapterIndex) {
-        long deletedPhrases = deletePhrasesByChapter(dataSource.getCHAPTERS()[chapterIndex]);
-        SQLiteDatabase db = this.getWritableDatabase();
-        int updatedPhrases = (int) (insertPhrasesFromFile(db, chapterIndex) - deletedPhrases);
-        return updatedPhrases;
-    }
 
+    /**
+     * Checks if phrase exists. Checks only singular form and translation.
+     *
+     * @param p phrase to check
+     * @return if phrase exists
+     */
     public boolean doPhraseExist(Phrase p) {
         SQLiteDatabase db = this.getReadableDatabase();
         String singular = p.getSingular();
@@ -188,6 +175,12 @@ public class DbHelper extends SQLiteOpenHelper {
         return false;
     }
 
+    /**
+     * Inserts phrase to local database.
+     *
+     * @param p phrase to insert
+     * @return if inserted successfully
+     */
     public long insertPhrase(Phrase p) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -214,6 +207,13 @@ public class DbHelper extends SQLiteOpenHelper {
                 && p1.isHard() != p2.isHard();
     }
 
+    /**
+     * Updates a phrase
+     *
+     * @param newPhrase new phrase
+     * @param oldPhrase phrase to edit
+     * @return if updated successfully
+     */
     public long updatePhrase(Phrase newPhrase, Phrase oldPhrase) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -234,6 +234,12 @@ public class DbHelper extends SQLiteOpenHelper {
         return success;
     }
 
+    /**
+     * Deletes a phrase with given id.
+     *
+     * @param id id of phrase to delete
+     * @return if deleted successfully
+     */
     public long deletePhraseById(int id) {
         SQLiteDatabase db = getReadableDatabase();
         long success = db.delete("phrases", "id=?", new String[]{String.valueOf(id)});

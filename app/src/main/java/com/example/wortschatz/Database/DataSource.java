@@ -17,6 +17,7 @@ public class DataSource {
     public static final String TAG = "tescior";
     private final ArrayList<String> chaptersList;
     private final ArrayList<Phrase> phrasesList;
+    // mozna dac do assetow
     private final String[] CHAPTERS = {
             "Człowiek",
             "Miejsce zamieszkania",
@@ -33,22 +34,6 @@ public class DataSource {
             "Świat przyrody",
             "Państwo i społeczeństwo"
     };
-    private final String[] FILE_NAMES = {
-            "czlowiek",
-            "zamieszkanie",
-            "edukacja",
-            "praca",
-            "zycie",
-            "zywienie",
-            "zakupy",
-            "podrozowanie",
-            "kultura",
-            "sport",
-            "zdrowie",
-            "nauka",
-            "przyroda",
-            "panstwo"
-    };
 
     public DataSource(Context context) {
         this.context = context;
@@ -56,6 +41,11 @@ public class DataSource {
         phrasesList = new ArrayList<>();
     }
 
+    /**
+     * Create ArrayList of chapters from String[].
+     *
+     * @return list of chapters
+     */
     private ArrayList<String> createChaptersList() {
         ArrayList<String> list = new ArrayList<>();
 
@@ -64,68 +54,13 @@ public class DataSource {
         return list;
     }
 
+    /**
+     * Getter to read all chapters' names.
+     *
+     * @return list of chapters
+     */
     public ArrayList<String> getChaptersList() {
         return chaptersList;
     }
 
-    // creating phrases list from files
-    public ArrayList<Phrase> getPhrasesListByChapter(int chapterIndex) {
-        String str = "";
-        String chapter = CHAPTERS[chapterIndex];
-        String fileName = FILE_NAMES[chapterIndex];
-        ArrayList<Phrase> list = new ArrayList<>();
-
-        try {
-            InputStream inputStream = context.getAssets().open(fileName);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
-            if (inputStream != null) {
-                while ((str = bufferedReader.readLine()) != null) {
-                    String[] array = str.split(";");
-                    Log.v(TAG, array[0]);
-                    String singular = array[0].trim();
-                    String plural = array[1].trim();
-                    String translation = array[2].trim();
-                    int isHard = Integer.parseInt(array[3].trim());
-
-                    Phrase phrase = new Phrase();
-                    phrase.setSingular(singular);
-                    phrase.setPlural(plural);
-                    phrase.setTranslation(translation);
-                    phrase.setHard(isHard == 1);
-                    phrase.setChapter(chapter);
-
-                    list.add(phrase);
-
-                    Log.v(TAG, phrase.toString());
-                }
-            }
-
-            if (inputStream != null) {
-                inputStream.close();
-            }
-
-        } catch (IOException e) {
-            Log.v(TAG, "Nie znaleziono pliku");
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-
-    public ArrayList<Phrase> getPhrasesList() {
-        for (int i = 0; i < FILE_NAMES.length; i++) {
-            ArrayList<Phrase> currentList = getPhrasesListByChapter(i);
-            phrasesList.addAll(currentList);
-        }
-        return phrasesList;
-    }
-
-    public String[] getCHAPTERS() {
-        return CHAPTERS;
-    }
-
-    public String[] getFILE_NAMES() {
-        return FILE_NAMES;
-    }
 }

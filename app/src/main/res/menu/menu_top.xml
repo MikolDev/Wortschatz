@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/item_update_phrases"
-        android:title="@string/update_phrases" />
+        android:id="@+id/item_add_phrases_from_txt"
+        android:title="@string/add_phrases_txt" />
 
 </menu>

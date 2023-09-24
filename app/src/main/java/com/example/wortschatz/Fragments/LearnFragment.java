@@ -24,6 +24,7 @@ public class LearnFragment extends Fragment {
     private DbHelper dbHelper;
     private ArrayList<Phrase> phrasesList;
     private String chapter;
+    private TextView tvChapter;
     private TextView tvSingular;
     private TextView tvPlural;
     private TextView tvCounter;
@@ -37,19 +38,34 @@ public class LearnFragment extends Fragment {
         dbHelper = mainActivity.getDbHelper();
         chapter = mainActivity.getCurrentChapter();
 
+        // Prepare those views
+        tvChapter = view.findViewById(R.id.learn_chapter);
         tvSingular = view.findViewById(R.id.learn_singular);
         tvPlural = view.findViewById(R.id.learn_plural);
         tvCounter = view.findViewById(R.id.learn_counter);
         phrasesList = dbHelper.getPhrasesByChapter(chapter);
 
-        setCounter(0);
-        showPhrase(0);
+        tvChapter.setText(chapter);
 
-        initSwipeListener();
+        // Check if there are some phrases in this chapter
+        if (phrasesList.size() > 0) {
+            setCounter(0);
+            showPhrase(0);
+
+            initSwipeListener();
+        } else {
+            // Show proper message if not
+            tvSingular.setText(getResources().getString(R.string.no_phrases));
+        }
 
         return view;
     }
 
+    /**
+     * Sets top counter to given number.
+     *
+     * @param i index of current phrase
+     */
     public void setCounter(int i) {
         if (i > phrasesList.size()){
             i = 0;
@@ -58,6 +74,11 @@ public class LearnFragment extends Fragment {
         tvCounter.setText(i + " / " + phrasesList.size());
     }
 
+    /**
+     * Shows particular phrase.
+     *
+     * @param i index of showed phrase
+     */
     public void showPhrase(int i) {
         Phrase currentPhrase = phrasesList.get(i);
 
@@ -65,6 +86,10 @@ public class LearnFragment extends Fragment {
         tvPlural.setText(currentPhrase.getPlural());
     }
 
+    /**
+     * Starts swiping listener. You can learn by swiping phrases like those girls on Tinder.
+     *
+     */
     public void initSwipeListener() {
         view.setOnTouchListener(new OnSwipeTouchListener(mainActivity){
             @Override

@@ -11,4 +11,6 @@
     <string name="translation">Tłumaczenie</string>
     <string name="as_hard">Oznacz jako trudne</string>
     <string name="are_sure">Czy jesteś pewny?</string>
+    <string name="no_phrases">Brak słówek w tym dziale. Dodaj jakieś w widoku listy.</string>
+    <string name="add_phrases_txt">Dodaj słówka z pliku TXT</string>
 </resources>
